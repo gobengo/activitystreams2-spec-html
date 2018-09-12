@@ -1,4 +1,4 @@
-default: lib
+default: built/activitystreams2-spec-html built/www/index.html
 .PHONY: default
 
 ts-node = ./node_modules/.bin/ts-node
@@ -8,5 +8,9 @@ node_modules: package.json
 	npm install
 	touch $@
 
-lib: node_modules $(SRCS)
-	npm run make:lib
+built/activitystreams2-spec-html: node_modules $(SRCS)
+	npm run build
+
+built/www/index.html: src/index.ts
+	mkdir -p built/www
+	$(ts-node) src/index.ts > $@

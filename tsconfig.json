@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["es2017"],
     "rootDir": "./src",
-    "outDir": "./built",
+    "outDir": "./built/activitystreams2-spec-html",
     // rest of compilerOptions from google/ts-style
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
