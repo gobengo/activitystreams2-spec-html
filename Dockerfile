@@ -23,8 +23,12 @@ RUN npm install
 
 COPY . /usr/src/app
 RUN npm run build
+
 ARG NPM_PRUNE
 RUN if ! [ -z "$NPM_PRUNE" ]; then npm prune; fi
+
+# Unique to this project
+RUN make
 
 FROM node:9-alpine as run-stage
 COPY --from=build-stage /usr/src/app /usr/src/app
