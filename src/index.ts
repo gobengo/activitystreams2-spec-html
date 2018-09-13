@@ -1,24 +1,58 @@
-import { scrapeVocabulary } from "activitystreams2-spec-scraped"
-import ntml from "lit-ntml"
+import {
+  scrapeVocabulary,
+  IOntology,
+  ParsedClass,
+  Property
+} from "activitystreams2-spec-scraped";
+import ntml from "lit-ntml";
 
-async function main () {
-  const as2Vocab = await scrapeVocabulary()
-  const html = ntml()
+interface Named {
+  name: string;
+}
+
+const html = ntml();
+
+const renderOntologyMember = (parsedClass: ParsedClass | Property) => html`
+  <a href="${parsedClass.url}">${parsedClass.name}</a> - ${parsedClass.notes}
+`;
+
+const renderOntologyDefinitions = (
+  ontology: IOntology<ParsedClass | Property>
+) => html`
+  <dl>
+  ${ontology.members.map(
+    member => html`
+    <dt><a href="${member.url}">${member.name}</a></dt>
+    <dd>${member.notes}</dd>
+  `
+  )}
+  </dl>
+`;
+
+async function main() {
+  const as2Vocab = await scrapeVocabulary();
+  const ontologiesOfTypes: Array<IOntology<ParsedClass> & Named> = [
+    { name: "Core Types", ...as2Vocab.sections.coreTypes },
+    { name: "Activity Types", ...as2Vocab.sections.activityTypes },
+    { name: "Actor Types", ...as2Vocab.sections.actorTypes },
+    { name: "Object And Link Types", ...as2Vocab.sections.objectTypes }
+  ];
+  const ontologiesOfProperties: Array<IOntology<Property> & Named> = [
+    { name: "Properties", ...as2Vocab.sections.properties }
+  ];
+  const ontologies = [...ontologiesOfTypes, ...ontologiesOfProperties];
   const rendered = await html`
     <!doctype html>
     <h1>ActivityStreams 2.0</h1>
     <p>Rendered from scraped owl:Ontology</p>
-    <h2>Core Types</h2>
-    <p>The Activity Vocabulary Core Types provide the basis for the rest of the vocabulary.</p>
-    <p>Base URI: <code>https://www.w3.org/ns/activitystreams#</code>.</p>
-    <p>The Activity Streams 2.0 Core Types include:</p>
-    <ul>${
-    as2Vocab.sections.coreTypes.members.map((coreTypeMember) => html`
-      <li><a href="${coreTypeMember.url}">${coreTypeMember.name}</a></li>
-    `)
-    }</ul>
-  `
-  console.log(rendered)
+    ${ontologies.map(
+      ontology => html`
+      <h2>${ontology.name}</h2>
+      ${renderOntologyDefinitions(ontology)}
+    `
+    )}
+  `;
+  console.log(rendered);
 }
 
 if (require.main === module) {
