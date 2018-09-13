@@ -31,6 +31,7 @@ const renderOntologyDefinitions = (
 
 async function main() {
   const as2Vocab = await scrapeVocabulary();
+  // @TODO(bengo.is) Add 'name' property to actual data graph so all this is unnecessary
   const ontologiesOfTypes: Array<IOntology<ParsedClass> & Named> = [
     { name: "Core Types", ...as2Vocab.sections.coreTypes },
     { name: "Activity Types", ...as2Vocab.sections.activityTypes },
